@@ -1,5 +1,5 @@
 # Instructions
-- Create python virtual environment
+- Create a python virtual environment
 ```bash
 python3 -m venv attacker
 ```
