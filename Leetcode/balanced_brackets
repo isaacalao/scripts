@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Import lib pkg, library
+source lib.sh
+
+#######################################
+# Main function for the script.
+# Globals:
+# 	None
+# Arguments:
+# 	Argument values (string)
+# Outputs:
+# 	Message
+# Returns:
+#   Exit status
+######################################
+function main() {
+  # String from argv joined via IFS
+  # Hashmap
+  local s="${@}" hashmap=( "{" "[" "(" "𝛆" "␀" )
+  readonly s hashmap
+    
+  # Return status to verify whether the check failed or not!
+  # We also make a bold assumption that the series of brackets will be balanced!
+  # Simple stack to keep track of open brackets
+  local errno=0 stk="" stk_ptr=-1
+  
+  for idx in $(seq 0 $((${#s}-1))); do
+    local key="${s:$idx:1}" 
+    local value="${hashmap[$(lib::hashmap_func "${key}")]}"
+    if [ "${value}" = "␀" ]; then # ignore non-brackets
+      continue;
+    elif [ "${value}" = "𝛆" ]; then # push open brackets to the stack
+      stk="${stk}${key}" stk_ptr=$((stk_ptr+1))
+    elif [ "${value}" = "${stk:$stk_ptr:1}" ]; then # pop open brackets from the stack if the current stack value  matches the key's value
+      stk="${stk:0:$stk_ptr}" stk_ptr=$((stk_ptr-1))
+    else
+      errno=1
+      break;
+    fi
+  done;
+  
+  if [ ${stk_ptr} -eq -1 ] && [ ${errno} -eq 0 ]; then
+    lib::ok "BALANCED!";
+  else
+    lib::err "NOT BALANCED!";
+    errno=1
+  fi
+
+  return ${errno}
+}
+
+main "${@}"
+exit $?
