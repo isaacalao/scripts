@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ -n "${_PS1}" ]; then
+  echo "Already activated!";
+else
+  _PS1="${PS1}"
+  PS1="(activated) ${PS1}"
+
+  template() {
+    [ -z "${1}" ] && return 1
+    return 1
+  }
+  
+  deactivate() {
+    PS1="${_PS1}";
+    unset _PS1;
+    unset -f template deactivate;
+    return 0;
+  }
+fi
