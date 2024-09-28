@@ -1,2 +1,2 @@
 # scripts
-Used for reference or actual use.
+For reference or actual use.
