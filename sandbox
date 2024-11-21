@@ -1,0 +1,30 @@
+#!/bin/bash
+# Init script for gotty
+
+USER_UUID=$(uuid)
+
+stop_container() {
+
+  USER_CONTAINER_EXIT_CODE=${?}
+ 
+  if docker container ls | grep -q "${USER_UUID}"; then
+    docker stop "${USER_UUID}" > /dev/null;
+  elif [ "${USER_CONTAINER_EXIT_CODE}" -eq 137 ]; then
+    printf "\x1b[31m%s\x1b[0m\n" "Possible OOM kill, contact the administrator of this machine for more information.";
+  else
+    printf "Exited with %s\n" "${USER_CONTAINER_EXIT_CODE}"
+  fi 
+
+  exit
+
+}
+
+trap stop_container EXIT
+
+docker run -it --rm \
+  --name "${USER_UUID}" \
+  --memory="128m" --memory-swap="128m" \
+  --cpus="0.25" --ulimit nproc=50 \
+  --ulimit nofile=256:1024 --ulimit core=0 \
+  --device-read-bps /dev/sda:1mb \
+  --device-write-bps /dev/sda:1mb alpine 
