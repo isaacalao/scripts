@@ -29,8 +29,8 @@ func_arr=$(cat <<EOF
 
     echo "context name: \${context}"
 
-    [ -f "${ABSOLUTE_SCRIPT_PATH}" ] && \
-      echo "sourced $(basename "${ABSOLUTE_SCRIPT_PATH}")" && \
+    [ -f "${ABSOLUTE_SCRIPT_PATH}" ] && \\
+      echo "sourced $(basename "${ABSOLUTE_SCRIPT_PATH}")" && \\
       source "${ABSOLUTE_SCRIPT_PATH}" "\${1}";
 
     return \$?
