@@ -27,7 +27,7 @@ func_arr=$(cat <<EOF
 
     ${context}_deactivate;
 
-    echo "context name: ${context}"
+    echo "context name: \${context}"
 
     [ -f "${ABSOLUTE_SCRIPT_PATH}" ] && \
       echo "sourced $(basename "${ABSOLUTE_SCRIPT_PATH}")" && \
