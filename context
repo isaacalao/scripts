@@ -1,0 +1,57 @@
+#!/bin/bash
+
+ABSOLUTE_SCRIPT_PATH="$(readlink -f -- "${0}")";
+
+if [ -n "${_PS1}" ]; then
+  echo "Already activated!";
+else
+  _PS1="${PS1}";
+  context="${1:=context}"
+  PS1="${context}(activated) ${PS1}";
+
+func_arr=$(cat <<EOF
+  ${context}_template() {
+    [ -z "\${1}" ] && return 1
+    return 1;
+  }
+  
+  ${context}_deactivate() {
+    PS1="\${_PS1}";
+    unset -f \$(${context}_print_funcs);
+    unset ABSOLUTE_SCRIPT_PATH _PS1;
+    unset context func_arr;
+    return 0;
+  }
+
+  ${context}_refresh() {
+
+    ${context}_deactivate;
+
+    echo "context name: ${context}"
+
+    [ -f "${ABSOLUTE_SCRIPT_PATH}" ] && \
+      echo "sourced $(basename "${ABSOLUTE_SCRIPT_PATH}")" && \
+      source "${ABSOLUTE_SCRIPT_PATH}" "\${1}";
+
+    return \$?
+  }
+
+  ${context}_funcs_def() {
+    echo "\${func_arr}" | bat -l bash
+  }  
+
+  ${context}_print_funcs() {
+    echo ${context}_{template,deactivate,refresh,print_funcs,pprint_funcs,funcs_def};
+  }
+
+  ${context}_pprint_funcs() {
+    for cmd in \$(${context}_print_funcs); do
+      echo -e "󰊕 \x1B[32m\${cmd}\x1B[0m"
+    done
+  }
+EOF
+)
+
+eval "${func_arr}"
+fi
+
